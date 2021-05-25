@@ -1,6 +1,5 @@
 const express = require("express");
 const cors = require("cors");
-const helmet = require("helmet");
 const compression = require("compression");
 const path = require("path")
 const HikesRouter = require("./hikes/routes.config");
@@ -8,13 +7,10 @@ const HikesRouter = require("./hikes/routes.config");
 const app = express();
 
 const port = process.env.PORT || 3003;
-
-// Setting CORS
-app.use(cors());
-// Setting headers to prevent well-know vulnerabilites
-app.use(helmet());
 // Using gzip compression
 app.use(compression());
+// Setting CORS
+app.use(cors());
 app.use(express.static(path.join(__dirname, "public")));
 // Default parameters for all requests
 app.use((req, res, next) => {

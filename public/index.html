@@ -28,7 +28,7 @@
             const convertetName = name.replace( /([A-Z])/g, " $1" );
             const finalName = convertetName.charAt(0).toUpperCase() + convertetName.slice(1);
             return `<div class="grid-item"><span class="item-name">${finalName}: </span><span class="item-amount">${amount > 900 ? amount + "ml" : amount}</span></div>`
-        } 
+        }
         
         function formSubmit(e) {
             const formData = new FormData(e);
@@ -115,7 +115,7 @@
         Going on a hike soon and don't know what to take? Don't worry, I'm here to help you out.
         Just put some basic information and I will try my best to advice you on what to take with you!</span>
     <div id="form-wrapper">
-        <form onsubmit="formSubmit(this); event.preventDefault();">
+        <form onsubmit="event.preventDefault(); formSubmit(this);">
             <div>
                 <label for="distance">Hike distance</label>
                 <input type="range" name="distance" min="1" max="200" value="15" id="distance-slider" oninput="this.nextElementSibling.textContent = this.valueAsNumber + `km`">
