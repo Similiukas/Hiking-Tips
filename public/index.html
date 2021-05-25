@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <!-- Icon made by Freepik https://freepik.com -->
+    <link rel="shortcut icon" href="man-with-bag-and-walking-stick.svg" type="image/x-icon">
+    <title>Hiking Tips</title>
+    <script>
+        const generalTips = `<div id='general-tips'>
+            <div id='general-tip-info'>And some general tips:</div>
+            <div class='tip'>&#x25cf; Don't forget to clean up after yourself by taking the trash</div>
+            <div class='tip'>&#x25cf; The key to long hikes is having comfortobale shoes</div>
+            <div class='tip'>&#x25cf; Make a campfire only if it is allowed in that area</div>
+            <div class='tip'>&#x25cf; Be respectful to nature and animals</div>
+            <div class='tip'>&#x25cf; Don't blast your music on max volume</div>
+            <div class='tip'>&#x25cf; Plan your route beforehand</div>
+            <div class='tip'>&#x25cf; Make sure you are hiking not in private areas</div>
+            <div class='tip'>&#x25cf; Check for water sources near your route</div>
+            <div class='tip'>&#x25cf; Bring your phone in case of emergency</div>
+            <div class='tip">&#x25cf; And Have Fun!</div>
+        </div>`
+
+        const gridItemTemplate = (name, amount) => {
+            // Converting camel case https://stackoverflow.com/a/7225450/9819103
+            const convertetName = name.replace( /([A-Z])/g, " $1" );
+            const finalName = convertetName.charAt(0).toUpperCase() + convertetName.slice(1);
+            return `<div class="grid-item"><span class="item-name">${finalName}: </span><span class="item-amount">${amount > 900 ? amount + "ml" : amount}</span></div>`
+        } 
+        
+        function formSubmit(e) {
+            const formData = new FormData(e);
+            const formObject = Object.fromEntries(formData);
+            console.log(formObject, typeof formObject);
+            fetch("/form-submit", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(formObject)
+            })
+            .then(response => {
+                console.log("response", response);
+                if (!response.ok || response.status !== 200)    throw new Error(response.statusText);
+                return response.json();
+            })
+            .then(result => {
+                console.log("Final result", result);
+                displayResults(result);
+            })
+            .catch(err => {
+                console.error("Error", err);
+            })
+
+        }
+        
+        function displayResults(results) {
+            const resultWrapper = document.querySelector("#result-wrapper");
+            // If result block is already displayed, then resetting to initial state to not show previous results
+            if (resultWrapper.style.display === "block") {
+                resultWrapper.innerHTML = "<span id='result-info'>Here are some things you should probably take</span>"
+            }
+            // Setting results for all possible number of days
+            for (var i = 0; i < results.possibleNumberOfDays.length; ++i){
+                // Creating whole day wrapper
+                var dayWrapper = document.createElement("div");
+                dayWrapper.setAttribute("class", "day-wrapper");
+                // Creating food grid wrapper
+                dayWrapper.innerHTML = `<span class="day-info">If you're going for <span class="day-amount">${i + 1}</span> day trip</span>`
+                var foodGridWrapper = document.createElement("div");
+                foodGridWrapper.setAttribute("class", "day-grid-wrapper");
+                // Adding elements to food grid wrapper
+                for (const key in results.days[i].food) {
+                    if (results.days[i].food[key] === 0)    continue;
+                    foodGridWrapper.innerHTML += gridItemTemplate(key, results.days[i].food[key]);
+                }
+                dayWrapper.appendChild(foodGridWrapper);
+                // Just for one day, no shelter items will be given
+                if (i === 0 ){
+                    resultWrapper.appendChild(dayWrapper);
+                    continue;
+                }
+                // Creating shelter grid wrapper
+                dayWrapper.innerHTML += "<span class='shelter-info'>You should also take</span>";
+                var shelterGridWrapper = document.createElement("div");
+                shelterGridWrapper.setAttribute("class", "day-grid-wrapper");
+                for (const key in results.days[i].shelter) {
+                    shelterGridWrapper.innerHTML += gridItemTemplate(key, results.days[i].shelter[key]);
+                }
+                dayWrapper.appendChild(shelterGridWrapper);
+                resultWrapper.appendChild(dayWrapper);
+            }
+            // Setting misc items
+            var miscItemsWrapper = document.createElement("div");
+            miscItemsWrapper.setAttribute("class", "misc-items");
+            miscItemsWrapper.innerHTML = "<span class='misc-info'>Some other items you should concider</span>";
+            // Creating misc items grid
+            var miscGridWrapper = document.createElement("div");
+            miscGridWrapper.setAttribute("class", "misc-wrapper");
+            for (const key in results.miscellaneous) {
+                miscGridWrapper.innerHTML += gridItemTemplate(key, results.miscellaneous[key]);
+            }
+            miscItemsWrapper.appendChild(miscGridWrapper);
+            resultWrapper.appendChild(miscItemsWrapper);
+            resultWrapper.innerHTML += generalTips;
+            // Displaying the whole result
+            resultWrapper.style.display = "block";
+        }
+    </script>
+</head>
+<body>
+    <span id="app-info">
+        Going on a hike soon and don't know what to take? Don't worry, I'm here to help you out.
+        Just put some basic information and I will try my best to advice you on what to take with you!</span>
+    <div id="form-wrapper">
+        <form onsubmit="formSubmit(this); event.preventDefault();">
+            <div>
+                <label for="distance">Hike distance</label>
+                <input type="range" name="distance" min="1" max="200" value="15" id="distance-slider" oninput="this.nextElementSibling.textContent = this.valueAsNumber + `km`">
+                <span id="distance-value">15km</span>
+            </div>
+            <div>
+                <label for="season">Pick a season</label>
+                <select name="season" id="">
+                    <option value="winter">Winter</option>
+                    <option value="spring">Spring</option>
+                    <option value="summer">Summer</option>
+                    <option value="autumn">Autumn</option>
+                </select>
+            </div>
+            <div>
+                <label for="vegetarian">Are you vegetarian?</label>
+                <input type="checkbox" name="vegetarian" value="off" id="">
+            </div>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+
+    <div id="result-wrapper" style="display: none;">
+        <div id="result-info">Here are some things you should probably take</div>
+    </div>
+</body>
+</html>
