@@ -86,13 +86,12 @@ input {
     text-align: center;
 }
 .item-name {
-    font-size: 1.3rem;
+    font-size: 1rem;
     vertical-align: middle;
 }
 .item-amount {
-    padding-left: 20px;
     vertical-align: middle;
-    font-size: var(--normalFont);    
+    font-size: 0.9rem;    
 }
 
 .misc-items {
@@ -110,7 +109,7 @@ input {
 }
 .tip {
     margin: 10px 0;
-    font-size: var(--normalFont);
+    font-size: 0.9rem;
 }
 
 @media (min-width: 1025px) {
@@ -125,5 +124,15 @@ input {
     }
     .day-food-wrapper, .day-grid-wrapper, .shelter-wrapper, .misc-wrapper {
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+    .item-name {
+        font-size: 1.3rem;
+    }
+    .item-amount {
+        padding-left: 20px;
+        font-size: var(--normalFont);    
+    }
+    .tip {
+        font-size: var(--normalFont);
     }
 }
